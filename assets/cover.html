@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>dsh-peak-valley cover</title>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1600px; height: 900px; overflow: hidden;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    background:
+      radial-gradient(760px 520px at 86% 16%, rgba(169,214,184,.55) 0%, rgba(169,214,184,0) 72%),
+      radial-gradient(620px 460px at 62% 92%, rgba(242,178,170,.45) 0%, rgba(242,178,170,0) 74%),
+      linear-gradient(135deg, #FBF6EA 0%, #F1E6D1 100%);
+    color: #1F2933;
+    display: flex; align-items: center; gap: 54px;
+    padding: 0 84px; box-sizing: border-box;
+  }
+  .left { width: 640px; flex: 0 0 auto; }
+  .tag {
+    display: inline-block; padding: 8px 18px; border: 3px solid #1F2933; border-radius: 999px;
+    font-size: 21px; letter-spacing: 2px; background: #FFFDF7;
+  }
+  h1 { font-size: 86px; line-height: 1.05; margin: 26px 0 22px; letter-spacing: -2px; font-weight: 800; }
+  h1 em { font-style: normal; }
+  h1 em.a { color: #5E9B76; }
+  h1 em.b { color: #D9766B; }
+  .lead { font-size: 33px; line-height: 1.5; margin: 0 0 22px; font-weight: 600; }
+  .note { font-size: 23px; line-height: 1.75; margin: 0 0 30px; color: #56616D; }
+  .note b { color: #1F2933; }
+  .pkg {
+    display: inline-block; font-family: "Cascadia Mono", Consolas, monospace; font-size: 22px;
+    padding: 11px 18px; border: 3px solid #1F2933; border-radius: 14px; background: #FFFDF7;
+  }
+
+  .stage { flex: 1 1 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 30px; }
+
+  .mock { width: 100%; filter: drop-shadow(0 26px 40px rgba(31,41,51,.14)); }
+  .band {
+    border-radius: 30px 30px 0 0; height: 104px; box-sizing: border-box;
+    display: flex; align-items: center; gap: 14px; padding: 0 26px 34px;
+    background: linear-gradient(90deg, #9FD2B1 0 62%, #EFF7F1 62% 100%);
+    color: #3F6B51;
+  }
+  .band.peak { background: linear-gradient(90deg, #F0AC9F 0 38%, #FDF0EE 38% 100%); color: #8C4A41; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 9px; height: 46px; padding: 0 16px;
+    border-radius: 13px; background: #FFFDF7; border: 2px solid rgba(31,41,51,.16);
+    font-size: 24px; color: #1F2933; font-weight: 600;
+  }
+  .chip i { width: 17px; height: 17px; border-radius: 50%; background: #7BA05B; display: block; }
+  .chip.gear i { border-radius: 4px; background: #9AA5B1; }
+  .grow { flex: 1 1 auto; }
+  .state { font-size: 25px; font-weight: 700; white-space: nowrap; }
+  .state small { font-weight: 500; opacity: .82; }
+
+  .card {
+    background: #FFFDF7; border-radius: 30px; margin-top: -32px; padding: 34px 30px 24px;
+    box-sizing: border-box;
+  }
+  .ph { font-size: 27px; color: #9AA5B1; margin-bottom: 30px; }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .plus {
+    width: 48px; height: 48px; border-radius: 50%; background: #F3EDE0; border: 2px solid rgba(31,41,51,.14);
+    display: flex; align-items: center; justify-content: center; font-size: 32px; color: #56616D; line-height: 1;
+  }
+  .tool { font-size: 23px; color: #56616D; }
+  .model { margin-left: auto; font-size: 21px; color: #7C8792; font-family: Consolas, monospace; }
+  .send {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(90deg, #CBE7D6, #F6CFC8); border: 2px solid rgba(31,41,51,.12);
+  }
+  .mock.small { width: 74%; }
+  .mock.small .band { height: 78px; padding-bottom: 26px; }
+  .mock.small .card { padding: 24px 22px 18px; }
+  .mock.small .ph { font-size: 22px; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <span class="tag">DEEPSEEK HARNESS 插件</span>
+    <h1><em class="a">峰</em><em class="b">谷</em>状态显示器</h1>
+    <p class="lead">输入框上方一条彩带，<br>告诉你现在峰还是谷、还剩多久。</p>
+    <p class="note">
+      <b>谷</b>浅绿 / <b>峰</b>浅红，与输入框同宽同圆角、同色描边；<br>
+      带上深浅就是剩余进度，右侧写明还剩多久；<br>
+      6 套马卡龙主题 + 自定义 CSS，只在 DeepSeek 模型下出现。
+    </p>
+    <span class="pkg">dsh-peak-valley</span>
+  </div>
+
+  <div class="stage">
+    <div class="mock">
+      <div class="band">
+        <span class="chip"><i></i>ForAI</span>
+        <span class="chip gear"><i></i>标准模式</span>
+        <span class="grow"></span>
+        <span class="state">谷 · <small>剩余 3 小时 49 分</small></span>
+      </div>
+      <div class="card">
+        <div class="ph">描述你想要构建的内容， / 调用指令， @ 文件或对话</div>
+        <div class="row">
+          <span class="plus">+</span>
+          <span class="tool">工作区内修改</span>
+          <span class="model">deepseek/deepseek-v4.1-flash-1017</span>
+          <span class="send"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mock small">
+      <div class="band peak">
+        <span class="grow"></span>
+        <span class="state">峰 · <small>剩余 1 小时 12 分</small></span>
+      </div>
+      <div class="card">
+        <div class="ph">官网公布的高峰时段会自动切成浅红</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

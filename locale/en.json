@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Peak / off-peak indicator",
+    "description": "With a DeepSeek model selected, a band above the composer shows peak (pale red) or off-peak (pale green) pricing, its remaining progress, and the time left in this phase."
+  }
+}

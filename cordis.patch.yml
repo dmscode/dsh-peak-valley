@@ -1,0 +1,6 @@
+# dsh-peak-valley 的 profile bundle patch。
+# 浏览器半边由 package.json 的 dsh.client 自动发现（/plugins/dsh-peak-valley/client.js）。
+
+- insert:
+    - id: peak-valley
+      name: 'dsh-peak-valley'

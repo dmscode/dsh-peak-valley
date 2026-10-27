@@ -1,0 +1,82 @@
+# Publish to npm when a version tag is pushed (tag push is the release trigger).
+# Authentication is npm trusted publishing (OIDC): no long-lived token lives in
+# the repo or in secrets. The npm package must have a trusted publisher bound to
+# this repository and this workflow file first, otherwise the publish step fails
+# with E404/E401 — bind it at
+# https://www.npmjs.com/package/dsh-peak-valley/access
+# → "Trusted publisher" → GitHub Actions: dmscode / dsh-peak-valley / release.yml.
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write # create the GitHub Release for the tag
+  id-token: write # required for npm trusted publishing (OIDC) and provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      # The tag is the single source of truth for the release version; refusing to
+      # publish a mismatched package keeps the registry and git history in sync.
+      - name: Verify tag matches package.json version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      # No dependency install step: the package has no runtime dependencies, and
+      # `npm ci` would demand a lockfile that is not worth committing. `npm test`
+      # only parses the two shipped JavaScript files.
+      - run: npm test
+
+      - name: Publish
+        run: npm publish --provenance --access public
+
+      # Registry ingestion is asynchronous: it can take seconds or minutes. Poll
+      # before advertising the version on the Release page, and treat a timeout as
+      # "maybe staged for approval" rather than a hard failure.
+      - name: Verify the version reached the registry
+        id: verify
+        continue-on-error: true
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for attempt in $(seq 1 60); do
+            if npm view "dsh-peak-valley@${version}" version >/dev/null 2>&1; then
+              echo "::notice::dsh-peak-valley@${version} is live on the registry"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning::dsh-peak-valley@${version} still absent after 10 minutes — check for a staged publish needing approval"
+          exit 1
+
+      - name: Pack tarball
+        if: steps.verify.outcome == 'success'
+        run: npm pack
+
+      - name: Build release notes from CHANGELOG
+        if: steps.verify.outcome == 'success'
+        run: node scripts/release-notes.mjs "${GITHUB_REF_NAME#v}" > release-notes.md
+
+      - name: Create GitHub Release
+        if: steps.verify.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dsh-peak-valley-*.tgz \
+            --title "dsh-peak-valley ${GITHUB_REF_NAME#v}" \
+            --notes-file release-notes.md

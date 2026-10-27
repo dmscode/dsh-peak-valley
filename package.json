@@ -1,0 +1,63 @@
+{
+  "name": "dsh-peak-valley",
+  "version": "0.1.0",
+  "description": "Peak / off-peak band above the DeepSeek Harness composer: pale green for off-peak, pale red for peak, with the phase's remaining progress and time left, plus themes and custom CSS.",
+  "icon": "./assets/icon.svg",
+  "author": "稻米鼠",
+  "license": "MIT",
+  "homepage": "https://github.com/dmscode/dsh-peak-valley#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmscode/dsh-peak-valley.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dmscode/dsh-peak-valley/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "deepseek",
+    "peak-valley",
+    "off-peak",
+    "pricing",
+    "composer"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./assets/icon.svg"
+  },
+  "files": [
+    "lib/**/*.js",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "locale/*.json",
+    "assets/icon.svg",
+    "assets/icon-512.png",
+    "assets/cover-1600x900.png",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node --check lib/index.js && node --check lib/client.js"
+  }
+}
