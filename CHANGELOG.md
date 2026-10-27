@@ -28,3 +28,4 @@
 - `package.json` 声明 `"icon": "./assets/icon.svg"`（宿主 `iconOf()` 只认清单里的相对路径、≤256 KiB），否则插件列表只显示默认图标。
 - `locale/zh.json`、`locale/en.json` 提供中英文标题与简介；`exports` 放行 `"./locale/*.json"`，否则 ESM 解析会因白名单抛 `ERR_PACKAGE_PATH_NOT_EXPORTED`。
 - `.github/workflows/release.yml`：推送 `v*` tag 发布，正文由 `scripts/release-notes.mjs` 从本文件生成。
+- 首包 0.1.0 由人工 `npm publish` 发出：npm 的 trusted publisher 只能绑到**已存在**的包上，OIDC 无法创建新包（tag 触发的第一次 CI 就是因此 E404）。registry 上的 `0.0.0-stage` 是创建包名时留下的占位版本，正常现象。绑好 trusted publisher 之后，后续 `v*` tag 全部走 CI，带 provenance。

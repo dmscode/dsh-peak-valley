@@ -3,3 +3,4 @@ node_modules/
 .dsh-market/
 .DS_Store
 publish.log
+release-notes.md
