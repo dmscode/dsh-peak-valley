@@ -11,6 +11,11 @@
 - 删掉全部首屏测量：`heroRowOf`、`stackGapOf`、`HERO_PAD`、`--pv-hero-lift`、`--pv-hero-row`、`--pv-pad`、`--pv-hero-radius`，以及 `ResizeObserver` 与 `window.resize` 监听。
 - 运行时只认宿主的 `data-content-phase` 一个输入；打字期间不再改写任何 DOM 属性，闪烁的隐患（测量 → 改布局 → 再测量）从根上没有了。
 
+### 工程
+- 仍是本机手动发布：npm 包的 trusted publisher 还没绑到本仓库，推 tag 时 CI 的 publish 步会以 `E404` 失败（run 45324650672）。
+- 本机 npm 的默认 registry 是 `registry.npmmirror.com`，发布与查看 npmjs 上的元数据都要显式带上 `--registry=https://registry.npmjs.org`。
+- 本地打包产物与 CI 构建的 tarball 逐字节一致（shasum `3376f805e48fe9718155323b19ba2079c133a7a8`），可以据此判断「发布的是不是我以为的那份」。
+
 ## 0.1.2 — 2026-11-24
 
 ### 修复
