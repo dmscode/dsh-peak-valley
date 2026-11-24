@@ -17,10 +17,11 @@
 
 ## 显示
 
-- 状态带与输入卡片同宽、同顶圆角，底边用负 margin 藏进卡片，卡片圆角处露出带状底色 —— 观感是一块彩色圆角矩形上叠着白色圆角卡片。
+- 状态带与输入卡片同宽，用负 margin 把自己塞到卡片后面，卡片圆角处露出带状底色 —— 观感是一块彩色圆角矩形上叠着白色圆角卡片。
+- 会话视图里彩带在卡片**上方**（藏在卡片顶角后面）；新对话页里彩带在卡片**下方**（藏在卡片底角后面）。两处的厚度、字号、圆角完全一致，只是上下翻转 —— 新对话页那一行「项目 / 模式」是宿主自己画的，插件不去量它、也不去包它。
 - 输入卡片描边跟随主色（改 `--dsw-elevation-stroke-color`，不动哈希类名）。
 - 深浅分界 = 本阶段剩余时长百分比；右侧「峰 · 剩余 N天N小时」，与左侧的项目/模式选择对称，不再另给标签底色。
-- 文字默认比可见带略高（`--pv-lift`），避免贴到卡片边上。
+- 两处的可见带高都是 `--pv-band` = 一行文字上下各留 4px（默认约 20px），一个变量同时改两处。
 
 ### 与宿主尺寸绑定
 
@@ -29,11 +30,13 @@
 | 状态带上的量 | 绑定到 |
 | --- | --- |
 | 藏进卡片的深度 `--pv-tuck` | `--dsw-radius-panel` + 2px（输入卡片圆角 + 肩部余量） |
-| 上下圆角 | 下沿用 `--dsw-radius-panel`；首屏上沿 `--pv-hero-radius: min(--dsw-radius-panel, 行高 × .55)`，薄条上不会塌成半圆 |
-| 字号 / 可见高度 | `clamp(11px, .75em, 13px)` + `calc(1em + 14px)`，跟系统基准字号走 |
+| 上下圆角 | 上下都取 `--dsw-radius-panel`（与输入卡片同一套圆角） |
+| 字号 / 带高 `--pv-band` | `clamp(11px, .75em, 13px)` + `calc(1em + 8px)`，跟系统基准字号走（16px 基准 → 12px 字 → 20px 带） |
 | 宽度 / 与卡片的间距 | `--dsh-composer-side-clearance`、`--dsh-composer-card-max-width`、`--dsh-composer-stack-gap` |
 
-首屏（hero）里「项目 / 模式」那一行会叠在带上：条向上量到那一行顶部，行高、抬升量、文字内边距全部运行时实测写入 CSS 变量，窗口缩放、侧栏开合、首屏↔会话切换都会立刻重量（ResizeObserver + MutationObserver，400ms 节流）。
+首屏的彩带是 `order: 3` 排到卡片之后的（宿主子项默认 `order: 0`），再用负 `margin-top` 把上沿塞进卡片下沿：中间那个 `4px` 是输入框外层容器自己的下内边距。可见高度仍是 `--pv-band`，文字上下各 4px。
+
+**不闪烁的保证**：插件不测量任何几何 —— 宽度、高度、圆角全部由 CSS 跟随宿主变量，运行时只认一个输入：宿主的 `data-content-phase`（`hero` / `active`）。打字只改卡片里的内容，这个属性不变，于是打字期间一个 DOM 属性都不会被改写，也就没有「测量 → 改布局 → 再测量」的回路。
 
 ## 设置
 
@@ -48,8 +51,8 @@
 | 选择器 / 变量 | 作用 |
 | --- | --- |
 | `:root{--pv-c-valley / --pv-c-peak}` | 谷 / 峰主色，同时驱动状态带与卡片描边 |
-| `.pv-bar{--pv-band / --pv-tuck / --pv-lift}` | 可见高度 / 藏进卡片的深度（`--pv-tuck` 要不小于卡片圆角半径）/ 文字上移量 |
-| `.pv-bar[data-hero]{--pv-hero-radius}` | 首屏叠色时的上沿圆角，默认跟随输入框圆角 |
+| `.pv-bar{--pv-band / --pv-tuck}` | 可见高度（两处共用）/ 藏进卡片的深度（`--pv-tuck` 要不小于卡片圆角半径） |
+| `.pv-bar[data-hero]` | 只在新对话页生效（彩带挂在输入框下沿），想单独调就写这里 |
 | `.pv-bar[data-phase="peak"]`、`[data-phase="valley"]` | 只覆盖某一阶段 |
 | `--pv-pct` | 运行时写在 `.pv-bar` 上的剩余百分比，样式里可直接引用 |
 | `.pv-phase`、`.pv-remain` | 右侧的阶段字与剩余时长 |
@@ -58,7 +61,8 @@
 
 ```css
 :root{ --pv-c-valley:#c8ecd8; --pv-c-peak:#ffb3ab }
-.pv-bar[data-hero]{ --pv-hero-radius:20px }
+.pv-bar{ --pv-band:18px }            /* 两处的彩带都变薄 */
+.pv-bar[data-hero]{ --pv-band:16px } /* 只改新对话页那一条 */
 .pv-remain{ font-weight:600 }
 ```
 
@@ -84,7 +88,7 @@ dsh plugin --profile desktop add dsh-peak-valley
 
 ### 本地目录（开发用）
 
-`install_bundle` 同样接受一个绝对路径（例如 `F:\ForAI\dsh-peak-valley`），会以 `link:` 方式挂进 profile，改完刷新页面即可。
+`install_bundle` 同样接受一个绝对路径（例如 `F:\ForAI\dsh-plugins\dsh-peak-valley`），会以 `link:` 方式挂进 profile，改完刷新页面即可。
 
 装好之后**刷新 Web GUI 页面**（客户端模块随页面加载）。若是替换已安装的同名包，需要重启 DSH 桌面端才会加载新的模块版本。
 
@@ -92,7 +96,7 @@ dsh plugin --profile desktop add dsh-peak-valley
 
 - 只在 Web GUI 里生效（桌面端与浏览器打开的是同一套 Web 前端，两边都管用）。
 - 只有当前会话的模型 provider 或模型名命中 `deepseek` 时才显示；换成别家模型，状态带直接消失。
-- 新对话与进行中的对话都会出现；首屏时它与「项目 / 模式」那一行共用一条背景，进入会话后那一行不在，状态带独占一行。
+- 新对话与进行中的对话都会出现；首屏在输入框下沿，进入会话后在上沿，厚度一致。
 
 ## 兼容性与已知限制
 

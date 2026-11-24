@@ -1,6 +1,6 @@
 {
   "name": "dsh-peak-valley",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "Peak / off-peak band above the DeepSeek Harness composer: pale green for off-peak, pale red for peak, with the phase's remaining progress and time left, plus themes and custom CSS.",
   "icon": "./assets/icon.svg",
   "author": "稻米鼠",
