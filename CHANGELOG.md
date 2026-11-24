@@ -1,5 +1,11 @@
 # 更新日志
 
+## 0.1.4 — 2026-11-24
+
+### 工程
+- 本版没有功能变更，只用来验证发布链路：npm 包的 trusted publisher 已绑定到本仓库的 `release.yml`，推 `v*` tag 后由 GitHub Actions 用 OIDC 发布并附 provenance 签名，不再需要本机手动发。
+- 0.1.3 是本机手动发布的（当时 publish 步因未绑定而以 `E404` 失败），两者内容一致，区别只在有没有 provenance。
+
 ## 0.1.3 — 2026-11-24
 
 ### 变更
